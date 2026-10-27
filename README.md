@@ -40,9 +40,24 @@ microservices-demo/
 └── api-tests/            <- Bruno collection
 ```
 
-The starter project students download is tag `v4.16.0`, which has no Docker files.
+The starter project students download is tag `v4.16.0`, which has no Docker files. This solution is tag `v4.16.1` - the images are tagged `v4.16.1` to match.
 
 > H2 is an in-memory database: all users and orders are lost whenever a service restarts. That keeps the lesson focused on containers and deployment - a real system would use a persistent database per service.
+
+## Published images
+
+The `solution` branch has a GitHub Actions workflow, `.github/workflows/publish-images.yml`, that builds both services for `linux/amd64` and `linux/arm64` and pushes them to GitHub Container Registry on every push to `solution`:
+
+```
+ghcr.io/aie-devops/user-service:v4.16.1
+ghcr.io/aie-devops/order-service:v4.16.1
+```
+
+These are the fallback images in Lesson 4.16 - students can deploy them to Railway if they can't build or push their own. They are public, so anyone can pull them without logging in:
+
+```bash
+docker pull ghcr.io/aie-devops/user-service:v4.16.1
+```
 
 ## Run it locally with Docker Compose
 
