@@ -1,0 +1,28 @@
+info:
+  name: Get orders for John
+  type: http
+  seq: 13
+
+http:
+  method: GET
+  url: "{{orderServiceUrl}}/api/orders/user/{{johnId}}"
+  auth: inherit
+
+runtime:
+  assertions:
+    - expression: res.status
+      operator: eq
+      value: "200"
+  scripts:
+    - type: tests
+      code: |-
+        test("every order belongs to John", function() {
+          expect(res.body.length).to.be.at.least(1);
+          res.body.forEach(o => expect(o.userId).to.equal(bru.getVar("johnId")));
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

@@ -1,0 +1,27 @@
+info:
+  name: Get order by id
+  type: http
+  seq: 12
+
+http:
+  method: GET
+  url: "{{orderServiceUrl}}/api/orders/{{orderId}}"
+  auth: inherit
+
+runtime:
+  assertions:
+    - expression: res.status
+      operator: eq
+      value: "200"
+  scripts:
+    - type: tests
+      code: |-
+        test("returns the Laptop order", function() {
+          expect(res.body.productName).to.equal("Laptop");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

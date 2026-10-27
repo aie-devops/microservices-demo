@@ -1,0 +1,36 @@
+info:
+  name: Create order for Jane
+  type: http
+  seq: 9
+
+http:
+  method: POST
+  url: "{{orderServiceUrl}}/api/orders"
+  body:
+    type: json
+    data: |-
+      {
+        "userId": {{janeId}},
+        "productName": "Mouse",
+        "quantity": 2,
+        "totalPrice": 49.98
+      }
+  auth: inherit
+
+runtime:
+  assertions:
+    - expression: res.status
+      operator: eq
+      value: "201"
+  scripts:
+    - type: tests
+      code: |-
+        test("creates an order for Jane", function() {
+          expect(res.body.userId).to.equal(bru.getVar("janeId"));
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

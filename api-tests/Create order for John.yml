@@ -1,0 +1,42 @@
+info:
+  name: Create order for John
+  type: http
+  seq: 8
+
+http:
+  method: POST
+  url: "{{orderServiceUrl}}/api/orders"
+  body:
+    type: json
+    data: |-
+      {
+        "userId": {{johnId}},
+        "productName": "Laptop",
+        "quantity": 1,
+        "totalPrice": 1299.99
+      }
+  auth: inherit
+
+runtime:
+  assertions:
+    - expression: res.status
+      operator: eq
+      value: "201"
+  scripts:
+    - type: after-response
+      code: |-
+        bru.setVar("orderId", res.body.id);
+    - type: tests
+      code: |-
+        // 201 proves order-service called user-service and found the user
+        test("creates a PENDING order for John", function() {
+          expect(res.body.id).to.be.a("number");
+          expect(res.body.userId).to.equal(bru.getVar("johnId"));
+          expect(res.body.status).to.equal("PENDING");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

@@ -1,0 +1,27 @@
+info:
+  name: Order service health
+  type: http
+  seq: 2
+
+http:
+  method: GET
+  url: "{{orderServiceUrl}}/actuator/health"
+  auth: inherit
+
+runtime:
+  assertions:
+    - expression: res.status
+      operator: eq
+      value: "200"
+  scripts:
+    - type: tests
+      code: |-
+        test("order-service is UP", function() {
+          expect(res.body.status).to.equal("UP");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

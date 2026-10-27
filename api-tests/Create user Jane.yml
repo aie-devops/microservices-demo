@@ -1,0 +1,39 @@
+info:
+  name: Create user Jane
+  type: http
+  seq: 4
+
+http:
+  method: POST
+  url: "{{userServiceUrl}}/api/users"
+  body:
+    type: json
+    data: |-
+      {
+        "firstName": "Jane",
+        "lastName": "Smith",
+        "email": "jane.{{$timestamp}}@example.com"
+      }
+  auth: inherit
+
+runtime:
+  assertions:
+    - expression: res.status
+      operator: eq
+      value: "201"
+  scripts:
+    - type: after-response
+      code: |-
+        bru.setVar("janeId", res.body.id);
+    - type: tests
+      code: |-
+        test("returns the new user with an id", function() {
+          expect(res.body.id).to.be.a("number");
+          expect(res.body.firstName).to.equal("Jane");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

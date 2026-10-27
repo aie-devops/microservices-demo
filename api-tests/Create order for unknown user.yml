@@ -1,0 +1,37 @@
+info:
+  name: Create order for unknown user
+  type: http
+  seq: 10
+
+http:
+  method: POST
+  url: "{{orderServiceUrl}}/api/orders"
+  body:
+    type: json
+    data: |-
+      {
+        "userId": 999,
+        "productName": "Monitor",
+        "quantity": 1,
+        "totalPrice": 299.99
+      }
+  auth: inherit
+
+runtime:
+  assertions:
+    - expression: res.status
+      operator: eq
+      value: "400"
+  scripts:
+    - type: tests
+      code: |-
+        // user-service answered 404, so order-service rejects the order
+        test("explains the user was not found", function() {
+          expect(res.body.error).to.equal("User not found with ID: 999");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
