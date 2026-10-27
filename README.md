@@ -171,12 +171,34 @@ Start the services first (`docker compose up --detach --build`), then either:
 - **Bruno CLI:**
   ```bash
   cd api-tests
-  npx @usebruno/cli run
+  bru run
   ```
-  `run` sends every request in order and prints a pass/fail summary.
+  `run` sends every request in order and prints a pass/fail summary. Install the CLI with `npm install -g @usebruno/cli` (or use `npx @usebruno/cli run`). This collection uses Bruno's YAML format, so it needs a recent CLI (tested with 4.3.0) - check with `bru --version`.
 
 The emails include a timestamp (`john.{{$timestamp}}@example.com`), so you can run the collection repeatedly without hitting the unique-email rule.
 
-**Testing on Railway:** the service URLs are collection variables in `api-tests/opencollection.yml` (`userServiceUrl`, `orderServiceUrl`, default `http://localhost:8081` and `http://localhost:8082`). Change them to your Railway domains, e.g. `https://user-service-production-xxxx.up.railway.app`, and run the collection again.
+**Testing the live services:** the service URLs are variables (`userServiceUrl`, `orderServiceUrl`). By default they point at Docker Compose (`localhost:8081` / `8082`). The collection has two environments in `api-tests/environments/` that override them:
+
+| Environment | File | URLs |
+|---|---|---|
+| `local` | `environments/local.yml` | `http://localhost:8081`, `http://localhost:8082` |
+| `prod` | `environments/prod.yml` | The live services on Render |
+
+```bash
+cd api-tests
+bru run --env prod
+```
+
+`--env prod` loads `environments/prod.yml`, so the same 13 tests run against the live services. Run it from inside the `api-tests` folder - the CLI treats the current folder as the collection. In the Bruno app, pick the **prod** environment from the dropdown in the top-right corner before running the collection.
+
+To test another deployment (Railway, a classmate's services) without editing a file, override the variables on the command line:
+
+```bash
+bru run \
+  --env-var userServiceUrl=https://user-service-production-xxxx.up.railway.app \
+  --env-var orderServiceUrl=https://order-service-production-xxxx.up.railway.app
+```
+
+> **Render free plan:** idle services spin down after 15 minutes and take about a minute to wake up. The first two requests (the health checks) wake both services - expect them to be slow. A restarted user-service has an empty H2 database, which is fine because the collection creates its own users first.
 
 The "user-service is down" case (step 7) isn't in the collection, because it needs a container stopped first - test it by hand.

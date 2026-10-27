@@ -1,0 +1,7 @@
+name: prod
+variables:
+  # Live services on Render (no trailing slash)
+  - name: userServiceUrl
+    value: https://user-service-v4-16-1.onrender.com
+  - name: orderServiceUrl
+    value: https://order-service-v4-16-1.onrender.com
